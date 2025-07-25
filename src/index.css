@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 모바일 터치 최적화 */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 버튼 터치 상태 리셋 */
+button:active {
+  transform: scale(0.95);
+}
+
+button:focus {
+  outline: none;
+}
+
+/* 모바일에서 포커스 링 제거 */
+button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 @keyframes fade-in-down {
   from {
     opacity: 0;
