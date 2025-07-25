@@ -273,35 +273,6 @@ export default function App() {
     setResult(null);
   };
 
-  // 5. 공유 기능 메시지 최적화 - 모바일 최적화
-  const shareResult = async () => {
-    const text = `나의 헬스 DNA는... [${result.title}]! 💪\n${result.hashtags}\n\n나도 헬창 성향 테스트 해보기 👇`;
-
-    try {
-      // 모바일에서 Web Share API 사용
-      if (navigator.share) {
-        await navigator.share({
-          title: "헬창 성향 테스트",
-          text: text,
-          url: window.location.href,
-        });
-      } else {
-        // 데스크톱에서는 클립보드 복사
-        await navigator.clipboard.writeText(text + "\n" + window.location.href);
-        alert("결과가 복사되었습니다!");
-      }
-    } catch (error) {
-      console.error("공유 실패:", error);
-      // 폴백: 클립보드 복사
-      try {
-        await navigator.clipboard.writeText(text + "\n" + window.location.href);
-        alert("결과가 클립보드에 복사되었습니다!");
-      } catch (clipboardError) {
-        alert("공유에 실패했습니다. 수동으로 복사해주세요.");
-      }
-    }
-  };
-
   // 모바일 최적화된 UI
   if (showResult && result) {
     return (
@@ -350,11 +321,15 @@ export default function App() {
       <div className="max-w-md mx-auto w-full px-4">
         {/* Title - 항상 표시하도록 수정 */}
         <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            💪 헬창 성향 테스트
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
+            에겐남 vs 테토남 💥
+            <br />
+            당신의 헬창 성향은?
           </h1>
-          <p className="text-lg md:text-xl text-gray-400">
-            당신의 진짜 헬스 DNA를 찾아보세요
+          <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2">
+            20문항으로 알아보는 나의 운동 DNA,
+            <br />
+            지금 테스트 시작!
           </p>
         </div>
 
@@ -389,7 +364,7 @@ export default function App() {
             isAnimating ? "scale-95 opacity-50" : "scale-100 opacity-100"
           }`}
         >
-          <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-center min-h-[6rem] md:h-24 flex items-center justify-center">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-6 md:mb-8 text-center min-h-[5rem] md:min-h-[6rem] flex items-center justify-center leading-relaxed px-2">
             {questions[currentQuestion].question}
           </h2>
 
@@ -421,7 +396,7 @@ export default function App() {
                 appearance: "none",
               }}
             >
-              <p className="text-base md:text-lg">
+              <p className="text-sm md:text-base lg:text-lg leading-relaxed">
                 {questions[currentQuestion].optionA}
               </p>
             </button>
@@ -453,7 +428,7 @@ export default function App() {
                 appearance: "none",
               }}
             >
-              <p className="text-base md:text-lg">
+              <p className="text-sm md:text-base lg:text-lg leading-relaxed">
                 {questions[currentQuestion].optionB}
               </p>
             </button>
