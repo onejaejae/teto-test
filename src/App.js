@@ -443,7 +443,7 @@ export default function App() {
                 outline: "none",
               }}
             >
-              <p className="text-sm md:text-base lg:text-lg leading-relaxed">
+              <p className="text-sm md:text-base lg:text-lg  leading-relaxed">
                 {questions[currentQuestion].optionB}
               </p>
             </button>
