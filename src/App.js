@@ -228,7 +228,24 @@ export default function App() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    // 모바일에서 버튼 스타일 리셋을 위한 강제 처리
+    // 모바일에서 버튼 스타일 완전 리셋
+    const resetButtonStyles = () => {
+      // 모든 버튼의 포커스 해제
+      const buttons = document.querySelectorAll("button");
+      buttons.forEach((button) => {
+        button.blur();
+        button.style.transform = "";
+        button.style.backgroundColor = "";
+      });
+
+      // 터치 상태 초기화
+      document.body.style.webkitTouchCallout = "none";
+      document.body.style.webkitUserSelect = "none";
+    };
+
+    // 즉시 스타일 리셋
+    resetButtonStyles();
+
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
@@ -237,10 +254,8 @@ export default function App() {
       }
       setIsAnimating(false);
 
-      // 모바일에서 버튼 포커스 해제
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
+      // 추가 리셋
+      resetButtonStyles();
     }, 300);
   };
 
@@ -382,17 +397,28 @@ export default function App() {
             <button
               key={`A-${currentQuestion}`}
               onClick={() => handleAnswer("A")}
-              onTouchEnd={(e) => {
-                // 터치 이벤트 후 포커스 해제
-                e.target.blur();
+              onTouchStart={(e) => {
+                // 터치 시작 시 스타일 초기화
+                e.target.style.transform = "scale(0.98)";
               }}
-              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 active:scale-95"
+              onTouchEnd={(e) => {
+                // 터치 종료 시 즉시 스타일 리셋
+                setTimeout(() => {
+                  e.target.style.transform = "";
+                  e.target.blur();
+                }, 100);
+              }}
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               style={{
-                // 모바일에서 터치 하이라이트 제거
+                // 모바일 터치 하이라이트 완전 제거
                 WebkitTapHighlightColor: "transparent",
                 WebkitTouchCallout: "none",
                 WebkitUserSelect: "none",
                 userSelect: "none",
+                // 추가 모바일 최적화
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
               }}
             >
               <p className="text-base md:text-lg">
@@ -403,17 +429,28 @@ export default function App() {
             <button
               key={`B-${currentQuestion}`}
               onClick={() => handleAnswer("B")}
-              onTouchEnd={(e) => {
-                // 터치 이벤트 후 포커스 해제
-                e.target.blur();
+              onTouchStart={(e) => {
+                // 터치 시작 시 스타일 초기화
+                e.target.style.transform = "scale(0.98)";
               }}
-              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 active:scale-95"
+              onTouchEnd={(e) => {
+                // 터치 종료 시 즉시 스타일 리셋
+                setTimeout(() => {
+                  e.target.style.transform = "";
+                  e.target.blur();
+                }, 100);
+              }}
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
               style={{
-                // 모바일에서 터치 하이라이트 제거
+                // 모바일 터치 하이라이트 완전 제거
                 WebkitTapHighlightColor: "transparent",
                 WebkitTouchCallout: "none",
                 WebkitUserSelect: "none",
                 userSelect: "none",
+                // 추가 모바일 최적화
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
               }}
             >
               <p className="text-base md:text-lg">
