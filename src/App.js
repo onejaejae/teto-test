@@ -223,44 +223,13 @@ export default function App() {
     }
   };
 
+  // 기존 handleAnswer 로직에서 resetButtonStyles 호출 시점을 조정
   const handleAnswer = (answer) => {
     setIsAnimating(true);
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    // 모바일에서 버튼 스타일 완전 리셋 - 강화된 버전
-    const resetButtonStyles = () => {
-      // 모든 버튼의 포커스 해제 및 스타일 초기화
-      const buttons = document.querySelectorAll("button");
-      buttons.forEach((button) => {
-        button.blur();
-        button.style.transform = "";
-        button.style.backgroundColor = "";
-        button.style.borderColor = "";
-        button.style.boxShadow = "";
-        button.style.outline = "";
-        button.style.webkitTapHighlightColor = "transparent";
-
-        // CSS 클래스 강제 제거
-        button.classList.remove("focus", "active", "hover");
-
-        // 인라인 스타일 완전 초기화
-        button.removeAttribute("style");
-      });
-
-      // 터치 상태 초기화
-      document.body.style.webkitTouchCallout = "none";
-      document.body.style.webkitUserSelect = "none";
-
-      // 포커스된 요소가 있다면 강제로 해제
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
-    };
-
-    // 즉시 스타일 리셋
-    resetButtonStyles();
-
+    // 버튼 스타일 리셋 로직을 onTransitionEnd (CSS 트랜지션 완료 후)나 setTimeout으로 더 안전하게 지연
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
@@ -269,17 +238,31 @@ export default function App() {
       }
       setIsAnimating(false);
 
-      // 추가 리셋 - 더 강력한 초기화
-      setTimeout(() => {
-        resetButtonStyles();
-      }, 50);
-    }, 300);
+      // 다음 질문으로 넘어간 후 또는 결과 화면 전환 직전에만 스타일 리셋을 시도
+      // 이 시점에서 DOM이 업데이트되고 이전 버튼이 화면에서 사라지거나 비활성화되어야 함
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      // 모든 버튼의 인라인 스타일을 강제로 제거하여 이전 터치/포커스 흔적 삭제
+      document.querySelectorAll("button").forEach((button) => {
+        button.removeAttribute("style");
+        button.classList.remove("focus", "active", "hover"); // 혹시 모를 클래스도 제거
+      });
+    }, 300); // isAnimating 트랜지션 시간과 동일하게 맞춤
   };
 
   const handleBack = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       setAnswers(answers.slice(0, -1));
+      // 뒤로가기 시에도 이전 버튼 포커스 해제 및 스타일 초기화
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      document.querySelectorAll("button").forEach((button) => {
+        button.removeAttribute("style");
+        button.classList.remove("focus", "active", "hover");
+      });
     }
   };
 
@@ -288,6 +271,36 @@ export default function App() {
     setAnswers([]);
     setShowResult(false);
     setResult(null);
+    // 재시작 시에도 모든 버튼 스타일 초기화
+    document.querySelectorAll("button").forEach((button) => {
+      button.removeAttribute("style");
+      button.classList.remove("focus", "active", "hover");
+    });
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  // 각 버튼의 onTouchStart, onTouchEnd, onTouchCancel 핸들러는 그대로 유지
+  // 다만, onTouchEnd/Cancel 내부의 setTimeout은 삭제하여 즉시 스타일 리셋이 되도록 함
+  // 이는 handleAnswer의 비동기 리셋 로직과 함께 작동하도록 하기 위함
+  const handleTouchStart = (e, type) => {
+    e.target.style.transform = "scale(0.98)";
+    e.target.style.backgroundColor = type === "A" ? "#1e40af" : "#7c3aed";
+  };
+
+  const handleTouchEnd = (e) => {
+    e.target.style.transform = "";
+    e.target.style.backgroundColor = "";
+    e.target.blur();
+    // 여기서 e.target.removeAttribute('style')은 handleAnswer에서 일괄 처리되도록 함
+  };
+
+  const handleTouchCancel = (e) => {
+    e.target.style.transform = "";
+    e.target.style.backgroundColor = "";
+    e.target.blur();
+    // 여기서 e.target.removeAttribute('style')은 handleAnswer에서 일괄 처리되도록 함
   };
 
   // 모바일 최적화된 UI
@@ -392,40 +405,18 @@ export default function App() {
             <button
               key={`A-${currentQuestion}`}
               onClick={() => handleAnswer("A")}
-              onTouchStart={(e) => {
-                // 터치 시작 시 스타일 초기화
-                e.target.style.transform = "scale(0.98)";
-                e.target.style.backgroundColor = "#1e40af";
-              }}
-              onTouchEnd={(e) => {
-                // 터치 종료 시 즉시 스타일 리셋
-                setTimeout(() => {
-                  e.target.style.transform = "";
-                  e.target.style.backgroundColor = "";
-                  e.target.blur();
-
-                  // 추가 강제 초기화
-                  e.target.removeAttribute("style");
-                }, 50);
-              }}
-              onTouchCancel={(e) => {
-                // 터치 취소 시에도 스타일 리셋
-                e.target.style.transform = "";
-                e.target.style.backgroundColor = "";
-                e.target.blur();
-              }}
+              onTouchStart={(e) => handleTouchStart(e, "A")}
+              onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchCancel}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               style={{
-                // 모바일 터치 하이라이트 완전 제거
                 WebkitTapHighlightColor: "transparent",
                 WebkitTouchCallout: "none",
                 WebkitUserSelect: "none",
                 userSelect: "none",
-                // 추가 모바일 최적화
                 WebkitAppearance: "none",
                 MozAppearance: "none",
                 appearance: "none",
-                // 포커스 스타일 제거
                 outline: "none",
               }}
             >
@@ -437,40 +428,18 @@ export default function App() {
             <button
               key={`B-${currentQuestion}`}
               onClick={() => handleAnswer("B")}
-              onTouchStart={(e) => {
-                // 터치 시작 시 스타일 초기화
-                e.target.style.transform = "scale(0.98)";
-                e.target.style.backgroundColor = "#7c3aed";
-              }}
-              onTouchEnd={(e) => {
-                // 터치 종료 시 즉시 스타일 리셋
-                setTimeout(() => {
-                  e.target.style.transform = "";
-                  e.target.style.backgroundColor = "";
-                  e.target.blur();
-
-                  // 추가 강제 초기화
-                  e.target.removeAttribute("style");
-                }, 50);
-              }}
-              onTouchCancel={(e) => {
-                // 터치 취소 시에도 스타일 리셋
-                e.target.style.transform = "";
-                e.target.style.backgroundColor = "";
-                e.target.blur();
-              }}
+              onTouchStart={(e) => handleTouchStart(e, "B")}
+              onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchCancel}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
               style={{
-                // 모바일 터치 하이라이트 완전 제거
                 WebkitTapHighlightColor: "transparent",
                 WebkitTouchCallout: "none",
                 WebkitUserSelect: "none",
                 userSelect: "none",
-                // 추가 모바일 최적화
                 WebkitAppearance: "none",
                 MozAppearance: "none",
                 appearance: "none",
-                // 포커스 스타일 제거
                 outline: "none",
               }}
             >
