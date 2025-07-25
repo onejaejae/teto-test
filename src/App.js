@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, RotateCcw } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 
 // 1. 문항 교체: 기획안에 맞춘 20개 문항으로 업데이트
 const questions = [
@@ -410,6 +411,7 @@ export default function App() {
             </div>
           </div>
         </div>
+        <Analytics />
       </div>
     );
   }
@@ -518,6 +520,7 @@ export default function App() {
           </div>
         </div>
       </div>
+      <Analytics />
     </div>
   );
 }
