@@ -228,19 +228,34 @@ export default function App() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    // 모바일에서 버튼 스타일 완전 리셋
+    // 모바일에서 버튼 스타일 완전 리셋 - 강화된 버전
     const resetButtonStyles = () => {
-      // 모든 버튼의 포커스 해제
+      // 모든 버튼의 포커스 해제 및 스타일 초기화
       const buttons = document.querySelectorAll("button");
       buttons.forEach((button) => {
         button.blur();
         button.style.transform = "";
         button.style.backgroundColor = "";
+        button.style.borderColor = "";
+        button.style.boxShadow = "";
+        button.style.outline = "";
+        button.style.webkitTapHighlightColor = "transparent";
+
+        // CSS 클래스 강제 제거
+        button.classList.remove("focus", "active", "hover");
+
+        // 인라인 스타일 완전 초기화
+        button.removeAttribute("style");
       });
 
       // 터치 상태 초기화
       document.body.style.webkitTouchCallout = "none";
       document.body.style.webkitUserSelect = "none";
+
+      // 포커스된 요소가 있다면 강제로 해제
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
     };
 
     // 즉시 스타일 리셋
@@ -254,8 +269,10 @@ export default function App() {
       }
       setIsAnimating(false);
 
-      // 추가 리셋
-      resetButtonStyles();
+      // 추가 리셋 - 더 강력한 초기화
+      setTimeout(() => {
+        resetButtonStyles();
+      }, 50);
     }, 300);
   };
 
@@ -326,11 +343,14 @@ export default function App() {
             <br />
             당신의 헬창 성향은?
           </h1>
-          <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2">
-            20문항으로 알아보는 나의 운동 DNA,
-            <br />
-            지금 테스트 시작!
-          </p>
+          {/* 서브타이틀은 첫 번째 질문에서만 표시 */}
+          {currentQuestion === 0 && (
+            <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2">
+              20문항으로 알아보는 나의 운동 DNA,
+              <br />
+              지금 테스트 시작!
+            </p>
+          )}
         </div>
 
         {/* Progress Bar & Question Area */}
@@ -375,13 +395,24 @@ export default function App() {
               onTouchStart={(e) => {
                 // 터치 시작 시 스타일 초기화
                 e.target.style.transform = "scale(0.98)";
+                e.target.style.backgroundColor = "#1e40af";
               }}
               onTouchEnd={(e) => {
                 // 터치 종료 시 즉시 스타일 리셋
                 setTimeout(() => {
                   e.target.style.transform = "";
+                  e.target.style.backgroundColor = "";
                   e.target.blur();
-                }, 100);
+
+                  // 추가 강제 초기화
+                  e.target.removeAttribute("style");
+                }, 50);
+              }}
+              onTouchCancel={(e) => {
+                // 터치 취소 시에도 스타일 리셋
+                e.target.style.transform = "";
+                e.target.style.backgroundColor = "";
+                e.target.blur();
               }}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               style={{
@@ -394,6 +425,8 @@ export default function App() {
                 WebkitAppearance: "none",
                 MozAppearance: "none",
                 appearance: "none",
+                // 포커스 스타일 제거
+                outline: "none",
               }}
             >
               <p className="text-sm md:text-base lg:text-lg leading-relaxed">
@@ -407,13 +440,24 @@ export default function App() {
               onTouchStart={(e) => {
                 // 터치 시작 시 스타일 초기화
                 e.target.style.transform = "scale(0.98)";
+                e.target.style.backgroundColor = "#7c3aed";
               }}
               onTouchEnd={(e) => {
                 // 터치 종료 시 즉시 스타일 리셋
                 setTimeout(() => {
                   e.target.style.transform = "";
+                  e.target.style.backgroundColor = "";
                   e.target.blur();
-                }, 100);
+
+                  // 추가 강제 초기화
+                  e.target.removeAttribute("style");
+                }, 50);
+              }}
+              onTouchCancel={(e) => {
+                // 터치 취소 시에도 스타일 리셋
+                e.target.style.transform = "";
+                e.target.style.backgroundColor = "";
+                e.target.blur();
               }}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
               style={{
@@ -426,6 +470,8 @@ export default function App() {
                 WebkitAppearance: "none",
                 MozAppearance: "none",
                 appearance: "none",
+                // 포커스 스타일 제거
+                outline: "none",
               }}
             >
               <p className="text-sm md:text-base lg:text-lg leading-relaxed">

@@ -2,17 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 모바일 터치 스타일 완전 제거 */
+/* 모바일 터치 스타일 완전 제거 - 강화된 버전 */
 * {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
 }
 
-/* 버튼 터치 스타일 제거 */
+/* 버튼 터치 스타일 완전 제거 */
 button {
   -webkit-tap-highlight-color: transparent !important;
   -webkit-touch-callout: none !important;
@@ -23,15 +23,41 @@ button {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
-}
-
-/* 터치 후 포커스 스타일 제거 */
-button:focus {
   outline: none !important;
 }
 
+/* 터치 후 포커스 스타일 완전 제거 */
+button:focus,
+button:active,
+button:hover {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 터치 상태 강제 초기화 */
 button:active {
   transform: scale(0.98) !important;
+}
+
+button:active:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 모바일 특화 스타일 제거 */
+@media (max-width: 768px) {
+  button {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  button:focus,
+  button:active {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
 }
 
 /* 애니메이션 */
