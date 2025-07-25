@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, Share2, RotateCcw } from "lucide-react";
+import { ChevronLeft, RotateCcw } from "lucide-react";
 
 // 1. 문항 교체: 기획안에 맞춘 20개 문항으로 업데이트
 const questions = [
@@ -311,14 +311,6 @@ export default function App() {
 
             <div className="space-y-3">
               <button
-                onClick={shareResult}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95"
-              >
-                <Share2 size={20} />
-                결과 공유하기
-              </button>
-
-              <button
                 onClick={restart}
                 className="w-full bg-gray-700 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-all active:scale-95"
               >
@@ -335,17 +327,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
       <div className="max-w-md mx-auto w-full px-4">
-        {/* Title for the first page */}
-        {currentQuestion === 0 && !isAnimating && (
-          <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              💪 헬창 성향 테스트
-            </h1>
-            <p className="text-lg md:text-xl text-gray-400">
-              당신의 진짜 헬스 DNA를 찾아보세요
-            </p>
-          </div>
-        )}
+        {/* Title - 항상 표시하도록 수정 */}
+        <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            💪 헬창 성향 테스트
+          </h1>
+          <p className="text-lg md:text-xl text-gray-400">
+            당신의 진짜 헬스 DNA를 찾아보세요
+          </p>
+        </div>
 
         {/* Progress Bar & Question Area */}
         <div className="mb-6 md:mb-8">
