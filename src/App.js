@@ -228,6 +228,7 @@ export default function App() {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
+    // 버튼 스타일 리셋을 위한 강제 리렌더링
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
@@ -374,8 +375,9 @@ export default function App() {
 
           <div className="space-y-4">
             <button
+              key={`A-${currentQuestion}`}
               onClick={() => handleAnswer("A")}
-              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-[1.03] active:scale-[0.98] touch-manipulation"
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 active:scale-95"
             >
               <p className="text-base md:text-lg">
                 {questions[currentQuestion].optionA}
@@ -383,8 +385,9 @@ export default function App() {
             </button>
 
             <button
+              key={`B-${currentQuestion}`}
               onClick={() => handleAnswer("B")}
-              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 border-2 border-transparent hover:border-purple-500 transition-all transform hover:scale-[1.03] active:scale-[0.98] touch-manipulation"
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 active:scale-95"
             >
               <p className="text-base md:text-lg">
                 {questions[currentQuestion].optionB}
