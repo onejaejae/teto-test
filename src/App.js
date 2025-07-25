@@ -252,48 +252,67 @@ export default function App() {
     setResult(null);
   };
 
-  // 5. 공유 기능 메시지 최적화
-  const shareResult = () => {
+  // 5. 공유 기능 메시지 최적화 - 모바일 최적화
+  const shareResult = async () => {
     const text = `나의 헬스 DNA는... [${result.title}]! 💪\n${result.hashtags}\n\n나도 헬창 성향 테스트 해보기 👇`;
 
-    if (navigator.share) {
-      navigator.share({
-        title: "헬창 성향 테스트",
-        text: text,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(text + "\n" + window.location.href);
-      alert("결과가 복사되었습니다!");
+    try {
+      // 모바일에서 Web Share API 사용
+      if (navigator.share) {
+        await navigator.share({
+          title: "헬창 성향 테스트",
+          text: text,
+          url: window.location.href,
+        });
+      } else {
+        // 데스크톱에서는 클립보드 복사
+        await navigator.clipboard.writeText(text + "\n" + window.location.href);
+        alert("결과가 복사되었습니다!");
+      }
+    } catch (error) {
+      console.error("공유 실패:", error);
+      // 폴백: 클립보드 복사
+      try {
+        await navigator.clipboard.writeText(text + "\n" + window.location.href);
+        alert("결과가 클립보드에 복사되었습니다!");
+      } catch (clipboardError) {
+        alert("공유에 실패했습니다. 수동으로 복사해주세요.");
+      }
     }
   };
 
-  // 4. UI/UX 개선: 결과 화면 레이아웃 수정
+  // 모바일 최적화된 UI
   if (showResult && result) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
-        <div className="max-w-md mx-auto w-full">
-          <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+        <div className="max-w-md mx-auto w-full px-4">
+          <div className="bg-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
             <div className="text-center mb-6">
-              <div className="text-8xl mb-4 animate-bounce">{result.emoji}</div>
-              <p className="text-yellow-400 font-semibold">{result.type}</p>
-              <h1 className="text-3xl font-bold mb-4">{result.title}</h1>
+              <div className="text-6xl md:text-8xl mb-4 animate-bounce">
+                {result.emoji}
+              </div>
+              <p className="text-yellow-400 font-semibold text-sm md:text-base">
+                {result.type}
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold mb-4">
+                {result.title}
+              </h1>
             </div>
 
-            <div className="mb-8 p-5 bg-gray-900 rounded-lg">
-              <p className="text-gray-300 leading-relaxed">
+            <div className="mb-6 md:mb-8 p-4 md:p-5 bg-gray-900 rounded-lg">
+              <p className="text-gray-300 leading-relaxed text-sm md:text-base">
                 {result.description}
               </p>
             </div>
 
-            <div className="mb-8 text-center text-lg text-purple-400 font-mono">
+            <div className="mb-6 md:mb-8 text-center text-base md:text-lg text-purple-400 font-mono">
               {result.hashtags}
             </div>
 
             <div className="space-y-3">
               <button
                 onClick={shareResult}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95"
               >
                 <Share2 size={20} />
                 결과 공유하기
@@ -301,7 +320,7 @@ export default function App() {
 
               <button
                 onClick={restart}
-                className="w-full bg-gray-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-all"
+                className="w-full bg-gray-700 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-all active:scale-95"
               >
                 <RotateCcw size={20} />
                 다시 테스트하기
@@ -315,24 +334,26 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
-      <div className="max-w-md mx-auto w-full">
+      <div className="max-w-md mx-auto w-full px-4">
         {/* Title for the first page */}
         {currentQuestion === 0 && !isAnimating && (
-          <div className="text-center mb-8 animate-fade-in-down">
-            <h1 className="text-4xl font-bold mb-2">💪 헬창 성향 테스트</h1>
-            <p className="text-xl text-gray-400">
+          <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              💪 헬창 성향 테스트
+            </h1>
+            <p className="text-lg md:text-xl text-gray-400">
               당신의 진짜 헬스 DNA를 찾아보세요
             </p>
           </div>
         )}
 
         {/* Progress Bar & Question Area */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex justify-between items-center mb-2">
             <button
               onClick={handleBack}
               disabled={currentQuestion === 0}
-              className={`p-2 rounded-lg ${
+              className={`p-3 md:p-2 rounded-lg ${
                 currentQuestion === 0 ? "opacity-0" : "hover:bg-gray-800"
               }`}
             >
@@ -353,27 +374,31 @@ export default function App() {
         </div>
 
         <div
-          className={`bg-gray-800 rounded-2xl p-8 shadow-2xl transition-all duration-300 ${
+          className={`bg-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl transition-all duration-300 ${
             isAnimating ? "scale-95 opacity-50" : "scale-100 opacity-100"
           }`}
         >
-          <h2 className="text-2xl font-bold mb-8 text-center h-24 flex items-center justify-center">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-center min-h-[6rem] md:h-24 flex items-center justify-center">
             {questions[currentQuestion].question}
           </h2>
 
           <div className="space-y-4">
             <button
               onClick={() => handleAnswer("A")}
-              className="w-full p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-[1.03] active:scale-[0.98]"
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 border-2 border-transparent hover:border-blue-500 transition-all transform hover:scale-[1.03] active:scale-[0.98] touch-manipulation"
             >
-              <p className="text-lg">{questions[currentQuestion].optionA}</p>
+              <p className="text-base md:text-lg">
+                {questions[currentQuestion].optionA}
+              </p>
             </button>
 
             <button
               onClick={() => handleAnswer("B")}
-              className="w-full p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 border-2 border-transparent hover:border-purple-500 transition-all transform hover:scale-[1.03] active:scale-[0.98]"
+              className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 border-2 border-transparent hover:border-purple-500 transition-all transform hover:scale-[1.03] active:scale-[0.98] touch-manipulation"
             >
-              <p className="text-lg">{questions[currentQuestion].optionB}</p>
+              <p className="text-base md:text-lg">
+                {questions[currentQuestion].optionB}
+              </p>
             </button>
           </div>
         </div>
