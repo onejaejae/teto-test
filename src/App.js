@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, RotateCcw, Share2, Home, Info } from "lucide-react";
+import { ChevronLeft, RotateCcw, Home, Info, Share2 } from "lucide-react";
 
 // 원본 질문 데이터
 const questions = [
@@ -224,6 +224,33 @@ const PersonalityTest = () => {
     }
   }, [showResult]);
 
+  useEffect(() => {
+    // 카카오 SDK 로드
+    const script = document.createElement("script");
+    script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js";
+    script.integrity =
+      "sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4";
+    script.crossOrigin = "anonymous";
+    script.onload = () => {
+      if (window.Kakao && !window.Kakao.isInitialized()) {
+        // ⚠️ 실제 배포시 카카오 앱 키 설정이 필요합니다
+        // 1. https://developers.kakao.com 에서 앱 생성
+        // 2. 플랫폼 설정에서 웹 플랫폼 추가 및 도메인 등록
+        // 3. 아래 주석을 해제하고 YOUR_KAKAO_APP_KEY를 실제 JavaScript 키로 교체
+        window.Kakao.init(process.env.REACT_APP_KAKAO_APP_KEY || ""); // 이 줄의 주석을 해제하고 키를 입력하세요
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // cleanup: 스크립트 제거
+      const existingScript = document.querySelector('script[src*="kakao"]');
+      if (existingScript) {
+        document.head.removeChild(existingScript);
+      }
+    };
+  }, []);
+
   const calculateResult = () => {
     let score = 0;
     answers.forEach((answer) => {
@@ -290,6 +317,97 @@ const PersonalityTest = () => {
       setResult(results.instinctive);
     } else {
       setResult(results.warrior);
+    }
+  };
+
+  // 바이럴 썸네일 URL 생성
+  const createViralThumbnail = (result) => {
+    // public 폴더의 이미지 사용
+    const baseUrl = window.location.origin; // 현재 도메인
+
+    const thumbnailImages = {
+      "순수 에겐남": `${baseUrl}/images/egen-pure.png`,
+      "에겐 성향": `${baseUrl}/images/egen.png`,
+      하이브리드: `${baseUrl}/images/hybrid.png`,
+      "테토 성향": `${baseUrl}/images/teto.png`,
+      "순수 테토남": `${baseUrl}/images/teto-pure.png`,
+    };
+
+    // 기본 이미지로 폴백
+    return thumbnailImages[result.type] || `${baseUrl}/images/default.png`;
+  };
+
+  // 카카오톡 공유 기능
+  const shareToKakao = () => {
+    const viralTitles = [
+      `🏋️‍♂️ 충격! 내 헬창 성향이 드디어 밝혀졌다`,
+      `💪 헬스장에서 나는 이런 사람이었어?!`,
+      `🔥 1분만에 알아보는 나의 진짜 헬창 DNA`,
+      `😱 친구들아, 내가 이런 헬창이었다니!`,
+      `🎯 헬스장 실화? 내 성향 테스트 결과 ㄷㄷ`,
+    ];
+
+    const viralDescriptions = [
+      `${result.emoji} "${result.title}" (${result.type})
+
+${result.hashtags}
+
+헬스장에서 이런 사람이었구나! 🤯
+너도 궁금하지 않아? 1분만 투자해봐!`,
+
+      `나는 ${result.type}! ${result.emoji}
+
+${result.percentage} ← 이거 진짜 희귀함 ㅋㅋ
+
+${result.hashtags}
+
+친구들아 나 이런 사람이었어 ㅠㅠ
+너희는 뭐가 나올까? 함께 해보자!`,
+
+      `🚨 긴급속보 🚨
+${result.emoji} ${result.title} 판정!
+
+${result.hashtags}
+
+1분이면 끝! 당장 해봐!
+우리 중에 누가 가장 특이할까? ㅋㅋㅋ`,
+    ];
+
+    const randomTitle =
+      viralTitles[Math.floor(Math.random() * viralTitles.length)];
+    const randomDescription =
+      viralDescriptions[Math.floor(Math.random() * viralDescriptions.length)];
+    const thumbnailUrl = createViralThumbnail(result);
+    const url = "https://teto-test-delta.vercel.app/";
+
+    // 카카오 SDK가 로드되어 있고 초기화되었는지 확인
+    if (window.Kakao && window.Kakao.isInitialized()) {
+      // 미리 만든 템플릿 사용
+      window.Kakao.Share.createCustomButton({
+        container: "#kakaotalk-sharing-btn",
+        templateId: 122828, // 미리 만든 템플릿 ID
+        templateArgs: {
+          title: randomTitle,
+          description: randomDescription,
+          imageUrl: thumbnailUrl,
+          url: url,
+        },
+      });
+    } else {
+      // 카카오 SDK가 없으면 기본 공유 사용
+      const shareText = `${randomTitle}\n\n${randomDescription}\n\n${url}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: randomTitle,
+          text: randomDescription,
+          url: url,
+        });
+      } else {
+        navigator.clipboard.writeText(shareText).then(() => {
+          alert("결과가 클립보드에 복사되었습니다!");
+        });
+      }
     }
   };
 
@@ -475,9 +593,13 @@ const PersonalityTest = () => {
             </div>
 
             <div className="space-y-3">
-              <button className="w-full bg-green-600 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-green-700 transition-all active:scale-95">
+              <button
+                id="kakaotalk-sharing-btn" // 이 ID 추가
+                onClick={shareToKakao}
+                className="w-full bg-yellow-500 text-black py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-yellow-400 transition-all active:scale-95"
+              >
                 <Share2 size={20} />
-                결과 공유하기
+                카카오톡으로 자랑하기
               </button>
               <button
                 onClick={restart}
