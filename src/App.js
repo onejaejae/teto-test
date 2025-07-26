@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, RotateCcw } from "lucide-react";
-import { Analytics } from "@vercel/analytics/react";
+import { ChevronLeft, RotateCcw, Share2, Home, Info } from "lucide-react";
 
-// 1. 문항 교체: 기획안에 맞춘 20개 문항으로 업데이트
+// 원본 질문 데이터
 const questions = [
   {
     id: 1,
@@ -143,7 +142,7 @@ const questions = [
   },
 ];
 
-// 2. 결과 유형 확장: 더 정확한 7가지 성향 분류
+// 결과 유형
 const results = {
   newton: {
     title: "헬스계의 아이작 뉴턴",
@@ -152,6 +151,7 @@ const results = {
     description:
       "당신의 헬스는 과학입니다. 운동복부터 보충제까지 모든 것이 계획되고 계산됩니다. 헬스장에 들어서는 순간, 당신의 눈은 뇌와 연결된 스캐너가 되어 모든 기구의 각도와 균형을 파악합니다. '점진적 과부하'는 당신의 종교이며, 운동 일지는 당신의 성경입니다. 하지만 가끔은 계산기를 내려놓고 심장이 시키는 운동을 해보는 건 어떨까요?",
     hashtags: "#헬스공학자 #인간엑셀 #기회의창맹신론자",
+    percentage: "전체 사용자의 15%",
   },
   systematic: {
     title: "체계적 실용주의자",
@@ -160,6 +160,7 @@ const results = {
     description:
       "당신은 결과를 위해 체계적으로 접근하지만, 형식에 얽매이지 않는 실용주의자입니다. 운동복은 편한 걸로, 하지만 루틴과 기록만큼은 철저하게 관리합니다. '보이는 것보다 실속'을 중시하며, 남들 눈에는 대충해 보여도 나름의 철학과 원칙이 확실한 똑똑한 헬창입니다.",
     hashtags: "#실용적완벽주의 #알짜배기헬창 #보이지않는노력",
+    percentage: "전체 사용자의 25%",
   },
   adaptive: {
     title: "적응형 헬창",
@@ -168,6 +169,7 @@ const results = {
     description:
       "당신은 기본기는 탄탄하지만 상황에 맞춰 유연하게 적응하는 헬창입니다. 계획과 준비는 철저히 하되, 그날 컨디션이나 헬스장 상황에 따라 과감하게 바꿀 줄도 압니다. 이론과 실전의 균형을 잘 맞추는 현명한 운동러로, 꾸준히 성장하는 비결을 알고 있습니다.",
     hashtags: "#현실적완벽주의 #상황판단력 #지속가능한성장",
+    percentage: "전체 사용자의 20%",
   },
   hybrid: {
     title: "밸런스형 헬창",
@@ -176,6 +178,7 @@ const results = {
     description:
       "당신은 진정한 균형의 달인입니다. 때로는 과학자처럼 냉철하게 분석하다가도, 어떤 날은 야수처럼 본능에 따라 운동합니다. 완벽한 준비를 할 때도 있고, 즉흥적으로 헬스장에 가서 땀을 흘릴 때도 있습니다. 이런 유연성이 오히려 지루하지 않게 운동을 지속하는 당신만의 비결입니다.",
     hashtags: "#다면적헬창 #상황적응력 #지루하지않는운동",
+    percentage: "전체 사용자의 20%",
   },
   instinctive: {
     title: "본능적 헬창",
@@ -184,6 +187,7 @@ const results = {
     description:
       "당신은 복잡한 이론보다 몸의 감각을 믿는 본능적인 헬창입니다. 계획은 대략적으로, 하지만 운동할 때만큼은 누구보다 집중력이 뛰어납니다. 기록보다는 그 순간의 느낌을, 자세보다는 강도를 중시합니다. 가끔 무모해 보일 수 있지만, 당신만의 야생적 감각이 만들어내는 성장이 있습니다.",
     hashtags: "#몸이기억한다 #야생의감각 #순간집중력",
+    percentage: "전체 사용자의 12%",
   },
   casual: {
     title: "편안한 헬창",
@@ -192,6 +196,7 @@ const results = {
     description:
       "당신은 운동을 '라이프스타일'로 받아들인 여유로운 헬창입니다. 복장도 편하게, 계획도 느슨하게, 하지만 꾸준히 즐기면서 합니다. 남들이 보기엔 대충하는 것 같아도, 나름의 페이스로 건강하게 운동을 지속하는 지혜로운 사람입니다. 운동이 스트레스가 아닌 힐링이 되는 타입이에요.",
     hashtags: "#편안한지속 #나만의페이스 #운동은즐거움",
+    percentage: "전체 사용자의 8%",
   },
   warrior: {
     title: "헬스장 전사",
@@ -200,10 +205,12 @@ const results = {
     description:
       "당신에게 헬스는 전쟁터입니다. 복장이나 계획 따위는 중요하지 않고, 오직 그 순간의 승부와 중량만이 중요합니다. 바벨은 당신의 무기이며, 매일매일이 어제의 자신을 이기는 싸움입니다. 당신의 운동 철학은 단순합니다: '더 무겁게, 더 강하게!' 헬스장에서 당신의 존재감은 압도적입니다.",
     hashtags: "#인간불도저 #중량이정의 #매일이전쟁",
+    percentage: "전체 사용자의 10%",
   },
 };
 
-export default function App() {
+// 메인 테스트 컴포넌트
+const PersonalityTest = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showResult, setShowResult] = useState(false);
@@ -216,7 +223,6 @@ export default function App() {
     }
   }, [showResult]);
 
-  // 3. 조건부 필터링 방식: 핵심 문항 조합으로 정확한 결과 도출
   const calculateResult = () => {
     let score = 0;
     answers.forEach((answer) => {
@@ -232,8 +238,6 @@ export default function App() {
     const satisfaction = answers[12]; // 13번: 운동 만족도
 
     // 조건부 필터링으로 정확한 결과 도출
-
-    // 완벽주의자 (모든 것이 체계적)
     if (
       outfit === "A" &&
       records === "A" &&
@@ -244,19 +248,16 @@ export default function App() {
       return;
     }
 
-    // 체계적 실용주의자 (복장은 편하지만 루틴/기록은 철저)
     if (outfit === "B" && records === "A" && routine === "A" && score >= 8) {
       setResult(results.systematic);
       return;
     }
 
-    // 적응형 헬창 (준비는 철저하지만 융통성 있음)
     if (outfit === "A" && warmup === "A" && records === "B" && score >= 4) {
       setResult(results.adaptive);
       return;
     }
 
-    // 편안한 헬창 (대부분 느슨하지만 나름 꾸준함)
     if (
       outfit === "B" &&
       records === "B" &&
@@ -267,7 +268,6 @@ export default function App() {
       return;
     }
 
-    // 전사형 (모든 것이 본능적이고 강도 중심)
     if (
       outfit === "B" &&
       records === "B" &&
@@ -292,13 +292,11 @@ export default function App() {
     }
   };
 
-  // 기존 handleAnswer 로직에서 resetButtonStyles 호출 시점을 조정
   const handleAnswer = (answer) => {
     setIsAnimating(true);
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
 
-    // 버튼 스타일 리셋 로직을 onTransitionEnd (CSS 트랜지션 완료 후)나 setTimeout으로 더 안전하게 지연
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
@@ -307,24 +305,20 @@ export default function App() {
       }
       setIsAnimating(false);
 
-      // 다음 질문으로 넘어간 후 또는 결과 화면 전환 직전에만 스타일 리셋을 시도
-      // 이 시점에서 DOM이 업데이트되고 이전 버튼이 화면에서 사라지거나 비활성화되어야 함
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
-      // 모든 버튼의 인라인 스타일을 강제로 제거하여 이전 터치/포커스 흔적 삭제
       document.querySelectorAll("button").forEach((button) => {
         button.removeAttribute("style");
-        button.classList.remove("focus", "active", "hover"); // 혹시 모를 클래스도 제거
+        button.classList.remove("focus", "active", "hover");
       });
-    }, 300); // isAnimating 트랜지션 시간과 동일하게 맞춤
+    }, 300);
   };
 
   const handleBack = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       setAnswers(answers.slice(0, -1));
-      // 뒤로가기 시에도 이전 버튼 포커스 해제 및 스타일 초기화
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
@@ -340,7 +334,6 @@ export default function App() {
     setAnswers([]);
     setShowResult(false);
     setResult(null);
-    // 재시작 시에도 모든 버튼 스타일 초기화
     document.querySelectorAll("button").forEach((button) => {
       button.removeAttribute("style");
       button.classList.remove("focus", "active", "hover");
@@ -350,9 +343,6 @@ export default function App() {
     }
   };
 
-  // 각 버튼의 onTouchStart, onTouchEnd, onTouchCancel 핸들러는 그대로 유지
-  // 다만, onTouchEnd/Cancel 내부의 setTimeout은 삭제하여 즉시 스타일 리셋이 되도록 함
-  // 이는 handleAnswer의 비동기 리셋 로직과 함께 작동하도록 하기 위함
   const handleTouchStart = (e, type) => {
     e.target.style.transform = "scale(0.98)";
     e.target.style.backgroundColor = type === "A" ? "#1e40af" : "#7c3aed";
@@ -362,17 +352,14 @@ export default function App() {
     e.target.style.transform = "";
     e.target.style.backgroundColor = "";
     e.target.blur();
-    // 여기서 e.target.removeAttribute('style')은 handleAnswer에서 일괄 처리되도록 함
   };
 
   const handleTouchCancel = (e) => {
     e.target.style.transform = "";
     e.target.style.backgroundColor = "";
     e.target.blur();
-    // 여기서 e.target.removeAttribute('style')은 handleAnswer에서 일괄 처리되도록 함
   };
 
-  // 모바일 최적화된 UI
   if (showResult && result) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
@@ -388,6 +375,7 @@ export default function App() {
               <h1 className="text-2xl md:text-3xl font-bold mb-4">
                 {result.title}
               </h1>
+              <p className="text-gray-400 text-sm mb-4">{result.percentage}</p>
             </div>
 
             <div className="mb-6 md:mb-8 p-4 md:p-5 bg-gray-900 rounded-lg">
@@ -401,6 +389,10 @@ export default function App() {
             </div>
 
             <div className="space-y-3">
+              <button className="w-full bg-green-600 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-green-700 transition-all active:scale-95">
+                <Share2 size={20} />
+                결과 공유하기
+              </button>
               <button
                 onClick={restart}
                 className="w-full bg-gray-700 text-white py-4 md:py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-all active:scale-95"
@@ -411,7 +403,6 @@ export default function App() {
             </div>
           </div>
         </div>
-        <Analytics />
       </div>
     );
   }
@@ -419,20 +410,41 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
       <div className="max-w-md mx-auto w-full px-4">
-        {/* Title - 항상 표시하도록 수정 */}
+        {/* Title */}
         <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
             에겐남 vs 테토남 💥
             <br />
             당신의 헬창 성향은?
           </h1>
-          {/* 서브타이틀은 첫 번째 질문에서만 표시 */}
           {currentQuestion === 0 && (
-            <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2">
-              20문항으로 알아보는 나의 운동 DNA,
-              <br />
-              지금 테스트 시작!
-            </p>
+            <div className="mb-8">
+              <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2 mb-6">
+                20문항으로 알아보는 나의 운동 DNA,
+                <br />
+                지금 테스트 시작!
+              </p>
+
+              {/* 간단한 설명 추가 */}
+              <div className="bg-gray-800 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🔬</div>
+                    <div className="font-semibold text-blue-400">에겐남</div>
+                    <div className="text-gray-400 text-xs">
+                      체계적 과학적 접근
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">⚔️</div>
+                    <div className="font-semibold text-red-400">테토남</div>
+                    <div className="text-gray-400 text-xs">
+                      본능적 열정적 접근
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
@@ -479,16 +491,6 @@ export default function App() {
               onTouchEnd={handleTouchEnd}
               onTouchCancel={handleTouchCancel}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-blue-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              style={{
-                WebkitTapHighlightColor: "transparent",
-                WebkitTouchCallout: "none",
-                WebkitUserSelect: "none",
-                userSelect: "none",
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                appearance: "none",
-                outline: "none",
-              }}
             >
               <p className="text-sm md:text-base lg:text-lg leading-relaxed">
                 {questions[currentQuestion].optionA}
@@ -502,25 +504,180 @@ export default function App() {
               onTouchEnd={handleTouchEnd}
               onTouchCancel={handleTouchCancel}
               className="w-full p-4 md:p-5 bg-gray-700 rounded-xl text-left hover:bg-purple-800/50 transition-all transform hover:scale-[1.03] touch-manipulation focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-              style={{
-                WebkitTapHighlightColor: "transparent",
-                WebkitTouchCallout: "none",
-                WebkitUserSelect: "none",
-                userSelect: "none",
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                appearance: "none",
-                outline: "none",
-              }}
             >
-              <p className="text-sm md:text-base lg:text-lg  leading-relaxed">
+              <p className="text-sm md:text-base lg:text-lg leading-relaxed">
                 {questions[currentQuestion].optionB}
               </p>
             </button>
           </div>
         </div>
       </div>
-      <Analytics />
     </div>
   );
-}
+};
+
+// About 페이지 (애드센스용 기본 정보)
+const About = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="text-center mb-12">
+          <div className="text-6xl mb-6">🏋️‍♂️</div>
+          <h1 className="text-4xl font-bold mb-4">헬창 성향 테스트</h1>
+          <p className="text-xl text-gray-600 leading-relaxed">
+            당신의 운동 성향을 재미있게 알아보세요
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-2xl font-bold mb-4 text-blue-600">
+              🎯 테스트 목적
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              헬스장에서의 다양한 상황을 통해 당신이 체계적인 에겐남인지,
+              본능적인 테토남인지 알아보는 테스트입니다.
+            </p>
+            <p className="text-gray-700 leading-relaxed">
+              20개의 실제 상황 질문으로 당신의 운동 성향을 분석하여, 더
+              효과적이고 재미있는 운동 방법을 찾을 수 있도록 도와줍니다.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h3 className="text-2xl font-bold mb-4 text-green-600">
+              📊 분석 방법
+            </h3>
+            <ul className="space-y-3 text-gray-700">
+              <li className="flex items-start gap-3">
+                <span className="text-green-500 font-bold">•</span>
+                <span>헬스장에서 실제로 겪는 상황들로 구성</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-500 font-bold">•</span>
+                <span>운동 스타일, 계획성, 강도 선호도 등 종합 분석</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-500 font-bold">•</span>
+                <span>7가지 세분화된 성향으로 정확한 결과</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-500 font-bold">•</span>
+                <span>재미있고 공감가는 결과 해석</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-8 mb-12">
+          <h3 className="text-2xl font-bold mb-6 text-center">
+            에겐남 vs 테토남
+          </h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-blue-50 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl">🔬</span>
+                <h4 className="text-xl font-bold text-blue-800">
+                  에겐남 (Evidence-based)
+                </h4>
+              </div>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                과학적 근거와 체계적 접근을 중시하는 운동인. 계획적이고 분석적인
+                스타일.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• 세밀한 운동 계획 수립</li>
+                <li>• 정확한 폼과 기법 중시</li>
+                <li>• 체계적인 기록 관리</li>
+                <li>• 과학적 영양 섭취</li>
+              </ul>
+            </div>
+
+            <div className="bg-red-50 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl">⚔️</span>
+                <h4 className="text-xl font-bold text-red-800">
+                  테토남 (Testosterone)
+                </h4>
+              </div>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                본능과 열정을 바탕으로 운동하는 사람. 직감적이고 에너지 넘치는
+                스타일.
+              </p>
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• 컨디션과 감정에 따른 운동</li>
+                <li>• 고강도, 고중량 선호</li>
+                <li>• 직감적이고 본능적 접근</li>
+                <li>• 열정과 의지력 중시</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-100 rounded-lg p-8 text-center">
+          <h3 className="text-2xl font-bold mb-4">📞 문의 및 피드백</h3>
+          <p className="text-gray-600 mb-6">
+            테스트 결과에 대한 궁금한 점이나 개선사항이 있으시면 언제든 연락해
+            주세요.
+          </p>
+          <div className="text-gray-600">
+            <strong>이메일:</strong> magicnc7@gmail.com
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 메인 앱 컴포넌트
+const SimpleApp = () => {
+  const [currentPage, setCurrentPage] = useState("home");
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case "home":
+        return <PersonalityTest />;
+      case "about":
+        return <About />;
+      default:
+        return <PersonalityTest />;
+    }
+  };
+
+  // 홈 페이지가 아닐 때만 네비게이션 표시
+  if (currentPage === "home") {
+    return (
+      <div>
+        {renderPage()}
+        {/* 하단 간단한 About 버튼 */}
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setCurrentPage("about")}
+            className="bg-white rounded-full shadow-lg p-3 text-gray-600 hover:text-blue-600 transition-colors"
+            title="서비스 소개"
+          >
+            <Info size={20} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* About 페이지에서는 상단에 홈 버튼 */}
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setCurrentPage("home")}
+          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+          title="홈으로"
+        >
+          <Home size={20} />
+        </button>
+      </div>
+      {renderPage()}
+    </div>
+  );
+};
+
+export default SimpleApp;
