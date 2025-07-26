@@ -216,6 +216,7 @@ const PersonalityTest = () => {
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [testStarted, setTestStarted] = useState(false);
 
   useEffect(() => {
     if (showResult) {
@@ -334,6 +335,7 @@ const PersonalityTest = () => {
     setAnswers([]);
     setShowResult(false);
     setResult(null);
+    setTestStarted(false);
     document.querySelectorAll("button").forEach((button) => {
       button.removeAttribute("style");
       button.classList.remove("focus", "active", "hover");
@@ -360,6 +362,90 @@ const PersonalityTest = () => {
     e.target.blur();
   };
 
+  // 랜딩 페이지
+  if (!testStarted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* 메인 타이틀 */}
+            <div className="mb-12 animate-fade-in-down">
+              <div className="text-6xl md:text-8xl mb-6">💪</div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                에겐남 vs 테토남
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 mb-8">
+                당신의 헬창 성향을 알아보는 재미있는 테스트
+              </p>
+            </div>
+
+            {/* 설명 섹션 */}
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div className="bg-blue-900/30 backdrop-blur-sm rounded-2xl p-8 border border-blue-500/20">
+                <div className="text-4xl mb-4">🔬</div>
+                <h3 className="text-2xl font-bold mb-4 text-blue-300">
+                  에겐남
+                </h3>
+                <p className="text-gray-300 leading-relaxed">
+                  과학적이고 체계적인 접근을 선호하는 운동인. 계획과 분석을 통해
+                  효율적인 운동을 추구합니다.
+                </p>
+              </div>
+
+              <div className="bg-red-900/30 backdrop-blur-sm rounded-2xl p-8 border border-red-500/20">
+                <div className="text-4xl mb-4">⚔️</div>
+                <h3 className="text-2xl font-bold mb-4 text-red-300">테토남</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  본능과 열정으로 운동하는 사람. 감정과 의지력을 바탕으로 강렬한
+                  운동을 즐깁니다.
+                </p>
+              </div>
+            </div>
+
+            {/* 테스트 정보 */}
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-gray-700">
+              <h3 className="text-2xl font-bold mb-6">📊 테스트 정보</h3>
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-3xl font-bold text-blue-400 mb-2">
+                    20문항
+                  </div>
+                  <div className="text-gray-400">실제 헬스장 상황</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-green-400 mb-2">
+                    3분
+                  </div>
+                  <div className="text-gray-400">예상 소요시간</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-purple-400 mb-2">
+                    7타입
+                  </div>
+                  <div className="text-gray-400">세분화된 결과</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 시작 버튼 */}
+            <div>
+              <button
+                onClick={() => setTestStarted(true)}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-12 py-4 rounded-2xl font-bold text-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-2xl"
+              >
+                🚀 테스트 시작하기
+              </button>
+              <p className="text-gray-400 text-sm mt-4">
+                * 개인정보 수집 없음 | 결과는 브라우저에만 저장
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 결과 페이지
   if (showResult && result) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
@@ -407,47 +493,10 @@ const PersonalityTest = () => {
     );
   }
 
+  // 테스트 진행 페이지
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4 flex items-center justify-center">
       <div className="max-w-md mx-auto w-full px-4">
-        {/* Title */}
-        <div className="text-center mb-6 md:mb-8 animate-fade-in-down">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
-            에겐남 vs 테토남 💥
-            <br />
-            당신의 헬창 성향은?
-          </h1>
-          {currentQuestion === 0 && (
-            <div className="mb-8">
-              <p className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed px-2 mb-6">
-                20문항으로 알아보는 나의 운동 DNA,
-                <br />
-                지금 테스트 시작!
-              </p>
-
-              {/* 간단한 설명 추가 */}
-              <div className="bg-gray-800 rounded-lg p-4 mb-6">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">🔬</div>
-                    <div className="font-semibold text-blue-400">에겐남</div>
-                    <div className="text-gray-400 text-xs">
-                      체계적 과학적 접근
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">⚔️</div>
-                    <div className="font-semibold text-red-400">테토남</div>
-                    <div className="text-gray-400 text-xs">
-                      본능적 열정적 접근
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Progress Bar & Question Area */}
         <div className="mb-6 md:mb-8">
           <div className="flex justify-between items-center mb-2">
@@ -621,7 +670,7 @@ const About = () => {
             주세요.
           </p>
           <div className="text-gray-600">
-            <strong>이메일:</strong> magicnc7@gmail.com
+            <strong>이메일:</strong> helchang.test@gmail.com
           </div>
         </div>
       </div>
