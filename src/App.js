@@ -385,7 +385,7 @@ ${result.hashtags}
       // 미리 만든 템플릿 사용
       window.Kakao.Share.createCustomButton({
         container: "#kakaotalk-sharing-btn",
-        templateId: 122828, // 미리 만든 템플릿 ID
+        templateId: process.env.REACT_APP_KAKAO_TEMPLATE_ID || "", // 미리 만든 템플릿 ID
         templateArgs: {
           title: randomTitle,
           description: randomDescription,
